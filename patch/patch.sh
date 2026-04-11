@@ -2,6 +2,7 @@
 # 这是一个自动生成的同步脚本，用于将修改应用到新的 OpenWrt 源码根目录
 
 echo "正在应用补丁文件到当前项目..."
+rm target/linux/generic/hack-6.12/400-mtd-spinand-Support-fmsh.patch target/linux/generic/hack-6.18/400-mtd-spinand-Support-fmsh.patch package/boot/uboot-mediatek/patches/342-mtd-spinand-Support-fmsh.patch
 mkdir -p "../package/boot/uboot-tools/uboot-envtools/files"
 cp -f "package/boot/uboot-tools/uboot-envtools/files/mediatek_filogic" "../package/boot/uboot-tools/uboot-envtools/files/mediatek_filogic"
 mkdir -p "../package/kernel/linux/modules"
@@ -50,5 +51,4 @@ mkdir -p "../target/linux/mediatek/patches-6.12"
 cp -f "target/linux/mediatek/patches-6.12/436-drivers-mtd-spi-nor-Add-calibration-support-for-spi-.patch" "../target/linux/mediatek/patches-6.12/436-drivers-mtd-spi-nor-Add-calibration-support-for-spi-.patch"
 mkdir -p "../target/linux/mediatek/patches-6.12"
 cp -f "target/linux/mediatek/patches-6.12/960-asus-hack-u-boot-ignore-mtdparts.patch" "../target/linux/mediatek/patches-6.12/960-asus-hack-u-boot-ignore-mtdparts.patch"
-rm target/linux/generic/hack-6.12/400-mtd-spinand-Support-fmsh.patch target/linux/generic/hack-6.18/400-mtd-spinand-Support-fmsh.patch package/boot/uboot-mediatek/patches/342-mtd-spinand-Support-fmsh.patch
 echo "补丁应用完成！"
