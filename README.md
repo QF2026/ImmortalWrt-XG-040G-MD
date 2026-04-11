@@ -2,10 +2,11 @@
 
 ImmortalWrt firmware for NOKIA BELL XG-040G-MD
 
-编译脚本基于 [Cairongzeng: Add support Nokia Bell XG-040G-MD](https://github.com/Cairongzeng/openwrt/tree/xg040gmd) , [Actions-OpenWrt](https://github.com/xuxin1955/Actions-OpenWrt) 修改。
+编译脚本基于 [OpenWrt-for-XG-040G-MD](https://github.com/dalutou/OpenWrt-for-XG-040G-MD) 修改。
 
 * 固件使用 ImmortalWrt openwrt-25.12 分支构建。
-* 使用 tcboot.bin 作为引导程序。
+* 仅包含流量监控插件luci-app-nlbwmon
+* 使用 [tcboot.bin](https://pan.baidu.com/s/1UWUXmZro0XFKmP-UHnbc1A?pwd=Nwrt#list/path=%2FNwrt%E5%9B%BA%E4%BB%B6%2F%E5%85%89%E7%8C%AB%E8%B4%9D%E5%B0%94) 作为引导程序。
 * **请准备好 USB-TTL，做好随时救砖的准备**。
 
 ## 目前遇到的问题
