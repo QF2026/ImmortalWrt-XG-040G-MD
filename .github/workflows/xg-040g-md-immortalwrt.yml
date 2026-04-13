@@ -21,9 +21,12 @@ on:
         required: true
         default: "patch-bingoguo93"
         type: choice
+        # ===================== 修改点1：新增patch-master选项 =====================
         options:
           - patch-bingoguo93
           - patch-xiangtailiang
+          - patch-master
+
   # 每24小时检查一次（UTC 0点，北京时间8点）
   schedule:
     - cron: '0 0 * * *'
@@ -31,7 +34,7 @@ on:
 env:
   CONFIG_FILE: "config/xg-040g-md.config"
   REPO_URL: https://github.com/immortalwrt/immortalwrt
-  REPO_BRANCH: openwrt-25.12
+  REPO_BRANCH: openwrt-25.12  # 默认分支，会被动态覆盖
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
@@ -39,11 +42,24 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # 🔥 修复点：删除了非法的 job 级别 if 判断
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      # ===================== 修改点2：动态设置分支/配置 =====================
+      - name: Set dynamic branch and config
+        id: dynamic_config
+        run: |
+          if [[ "${{ inputs.patch_type }}" == "patch-master" ]]; then
+            echo "REPO_BRANCH=master" >> $GITHUB_ENV
+            echo "IS_MASTER_PATCH=true" >> $GITHUB_ENV
+            echo "✅ 选择patch-master，切换源码为master分支"
+          else
+            echo "REPO_BRANCH=${{ env.REPO_BRANCH }}" >> $GITHUB_ENV
+            echo "IS_MASTER_PATCH=false" >> $GITHUB_ENV
+            echo "✅ 使用默认分支: ${{ env.REPO_BRANCH }}"
+          fi
 
       - name: Check remote branch for new commits
         id: check_commit
@@ -70,7 +86,6 @@ jobs:
             echo "should_build=true" >> $GITHUB_OUTPUT
           fi
 
-      # 🔥 修复点：步骤内部判断，无更新直接退出Job（语法合法）
       - name: Exit if no new commit
         if: steps.check_commit.outputs.should_build == 'false'
         run: exit 0
@@ -155,6 +170,21 @@ jobs:
           cd openwrt && make defconfig
           [ -e .config ] && cp .config defconfig-final.config
 
+      # ===================== 修改点3：自动修改master分支配置 =====================
+      - name: Modify config for patch-master
+        if: env.IS_MASTER_PATCH == 'true'
+        working-directory: ./openwrt
+        run: |
+          echo "🔧 正在为master分支修改配置..."
+          # 禁用 luci-app-nlbwmon
+          sed -i 's/^CONFIG_PACKAGE_luci-app-nlbwmon=y/# CONFIG_PACKAGE_luci-app-nlbwmon is not set/' .config
+          # 启用 中文默认设置
+          sed -i 's/^# CONFIG_PACKAGE_default-settings-chn is not set/CONFIG_PACKAGE_default-settings-chn=y/' .config
+          sed -i 's/^CONFIG_PACKAGE_default-settings-chn=n/CONFIG_PACKAGE_default-settings-chn=y/' .config
+          # 重新生成配置
+          make defconfig
+          echo "✅ master分支配置修改完成"
+
       - name: Upload build config files
         uses: actions/upload-artifact@v6
         with:
@@ -162,6 +192,7 @@ jobs:
           path: |
             config/xg-040g-md.config
             openwrt/defconfig-final.config
+            openwrt/.config
             openwrt/feeds.conf.default
 
       - name: Download packages
