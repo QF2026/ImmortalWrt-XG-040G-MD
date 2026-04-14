@@ -21,7 +21,6 @@ on:
         required: true
         default: "patch-master"
         type: choice
-        # ===================== 修改点1：新增patch-master选项 =====================
         options:
           - patch-bingoguo93-25.12
           - patch-xiangtailiang-25.12
@@ -144,7 +143,7 @@ jobs:
       - name: Apply XG-040G-MD Patch Files
         working-directory: ./openwrt
         run: |
-          SELECTED_PATCH=${{ inputs.patch_type || 'patch-bingoguo93' }}
+          SELECTED_PATCH=${{ inputs.patch_type || 'patch-bingoguo93-25.12' }}
           echo "SELECTED_PATCH=$SELECTED_PATCH" >> $GITHUB_ENV
           
           if [ -d "../$SELECTED_PATCH" ] && [ -f "../$SELECTED_PATCH/patch.sh" ]; then
@@ -164,12 +163,12 @@ jobs:
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
-      # ===================== 顺序调整：第一步：仅复制配置文件 =====================
+      # 复制基础配置文件
       - name: Copy base configuration file
         run: |
           [ -f "${CONFIG_FILE}" ] && cp -fv "${CONFIG_FILE}" openwrt/.config || echo "警告: 未找到配置文件"
 
-      # ===================== 顺序调整：第二步：修改patch-master配置（defconfig之前） =====================
+      # patch-master 专属配置修改（defconfig 之前执行）
       - name: Modify config for patch-master
         if: env.IS_MASTER_PATCH == 'true'
         working-directory: ./openwrt
@@ -182,7 +181,7 @@ jobs:
           sed -i 's/^CONFIG_PACKAGE_default-settings-chn=n/CONFIG_PACKAGE_default-settings-chn=y/' .config
           echo "✅ master分支配置修改完成"
 
-      # ===================== 顺序调整：第三步：执行第一次make defconfig =====================
+      # 生成最终配置
       - name: Generate defconfig and backup
         run: |
           cd openwrt && make defconfig
@@ -246,7 +245,7 @@ jobs:
           分支: ${{ env.REPO_BRANCH }}
           使用补丁: ${{ env.SELECTED_PATCH }}
           Commit Hash: ${{ env.COMMIT_HASH }}
-          Commit: [${{ env.COMMIT_MSG }}](${{ env.REPO_URL }}/commit/${{ COMMIT_HASH_FULL }})
+          Commit: [${{ env.COMMIT_MSG }}](${{ env.REPO_URL }}/commit/${{ env.COMMIT_HASH_FULL }})
           EOF
 
       - name: Publish GitHub Release
