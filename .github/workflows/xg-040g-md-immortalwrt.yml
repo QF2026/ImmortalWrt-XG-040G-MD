@@ -24,6 +24,7 @@ on:
         options:
           - patch-bingoguo93-25.12
           - patch-xiangtailiang-25.12
+          - patch-25.12.0-rc2  # 新增补丁选项
           - patch-master
 
   # 每24小时检查一次（UTC 0点，北京时间8点）
@@ -46,7 +47,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      # 动态设置分支/配置
+      # 动态设置分支/配置/Tag
       - name: Set dynamic branch and config
         id: dynamic_config
         run: |
@@ -54,6 +55,11 @@ jobs:
             echo "REPO_BRANCH=master" >> $GITHUB_ENV
             echo "IS_MASTER_PATCH=true" >> $GITHUB_ENV
             echo "✅ 选择patch-master，切换源码为master分支"
+          elif [[ "${{ inputs.patch_type }}" == "patch-25.12.0-rc2" ]]; then
+            # 新增：切换到官方Tag v25.12.0-rc2
+            echo "REPO_BRANCH=v25.12.0-rc2" >> $GITHUB_ENV
+            echo "IS_MASTER_PATCH=false" >> $GITHUB_ENV
+            echo "✅ 选择patch-25.12.0-rc2，切换源码为Tag: v25.12.0-rc2"
           else
             echo "REPO_BRANCH=${{ env.REPO_BRANCH }}" >> $GITHUB_ENV
             echo "IS_MASTER_PATCH=false" >> $GITHUB_ENV
@@ -65,7 +71,7 @@ jobs:
         run: |
           LATEST_COMMIT=$(git ls-remote ${{ env.REPO_URL }} ${{ env.REPO_BRANCH }} | awk '{print $1}')
           echo "LATEST_COMMIT=$LATEST_COMMIT" >> $GITHUB_ENV
-          echo "🔍 远程分支最新Commit: $LATEST_COMMIT"
+          echo "🔍 远程分支/Tag最新Commit: $LATEST_COMMIT"
           
           CACHED_COMMIT=$(cat last_commit.txt 2>/dev/null || echo "")
           echo "🔍 上一次构建Commit: $CACHED_COMMIT"
@@ -242,7 +248,7 @@ jobs:
           设备型号: XG-040G-MD
           构建时间: $(date +"%Y-%m-%d %H:%M")
           源码仓库: ${{ env.REPO_URL }}
-          分支: ${{ env.REPO_BRANCH }}
+          分支/Tag: ${{ env.REPO_BRANCH }}
           使用补丁: ${{ env.SELECTED_PATCH }}
           Commit Hash: ${{ env.COMMIT_HASH }}
           Commit: [${{ env.COMMIT_MSG }}](${{ env.REPO_URL }}/commit/${{ env.COMMIT_HASH_FULL }})
