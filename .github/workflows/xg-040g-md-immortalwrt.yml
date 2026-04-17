@@ -172,8 +172,7 @@ jobs:
       - name: list feeds
         working-directory: ./openwrt
         run: |
-          ./scripts/feeds list -n > all_packages.txt
-          cat all_packages.txt
+          make manifest | awk '{print $1}' | sort
           
             # 复制基础配置文件
       - name: Copy base configuration file
