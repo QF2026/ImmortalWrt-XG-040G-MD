@@ -168,13 +168,8 @@ jobs:
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install -a
-      
-      - name: list feeds
-        working-directory: ./openwrt
-        run: |
-          make manifest | awk '{print $1}' | sort
           
-            # 复制基础配置文件
+      # 复制基础配置文件
       - name: Copy base configuration file
         run: |
           [ -f "${CONFIG_FILE}" ] && cp -fv "${CONFIG_FILE}" openwrt/.config || echo "警告: 未找到配置文件"
