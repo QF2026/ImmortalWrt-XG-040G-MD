@@ -28,8 +28,8 @@ on:
           - patch-master
 
   # 每24小时检查一次（UTC 0点，北京时间8点）
-  schedule:
-    - cron: '0 0 * * *'
+  #schedule:
+    #- cron: '0 0 * * *'
 
 env:
   CONFIG_FILE: "config/xg-040g-md.config"
