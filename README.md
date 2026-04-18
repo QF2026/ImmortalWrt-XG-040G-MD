@@ -15,3 +15,4 @@ ImmortalWrt firmware for NOKIA BELL XG-040G-MD
 * [拆机、刷机、配置、原厂分区备份 教程](https://www.right.com.cn/forum/thread-8467912-1-1.html)
 * 使用[Nwrt](https://nwrt.kuroneko.host/flashdocs/XG-040G-MD.html)提供的 [tcboot.bin](https://pan.baidu.com/s/1UWUXmZro0XFKmP-UHnbc1A?pwd=Nwrt#list/path=%2FNwrt%E5%9B%BA%E4%BB%B6%2F%E5%85%89%E7%8C%AB%E8%B4%9D%E5%B0%94) 作为引导程序。
 * **请准备好 USB-TTL，做好随时救砖的准备**。
+(在fork的项目上加了几个依赖和ksmbd，支持安装aria2/easytier)
