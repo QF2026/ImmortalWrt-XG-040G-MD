@@ -65,7 +65,6 @@ jobs:
     
     - name: 运行 diy.sh 自定义脚本
       run: |
-        cd $OPENWRT_PATH
         chmod +x diy.sh
         ./diy.sh
         
