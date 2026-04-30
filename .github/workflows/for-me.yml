@@ -62,11 +62,7 @@ jobs:
         VERSION_INFO=$(git show -s --date=short --format="作者: %an<br/>时间: %cd<br/>内容: %s<br/>hash: %H")
         echo "VERSION_INFO=$VERSION_INFO" >> $GITHUB_ENV
         echo "REPO_BRANCH=$REPO_BRANCH" >> $GITHUB_ENV
-    
-    - name: 运行 diy.sh 自定义脚本
-      run: |
-        chmod +x diy.sh
-        ./diy.sh
+  
         
     - name: Generate Variables(生成变量)
       run: |
@@ -98,7 +94,11 @@ jobs:
         
     - name: Load Custom Configuration(加载自定义配置)
       run: |
+        chmod +x diy.sh
+        ./diy.sh
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE $OPENWRT_PATH/.config
+        cd  $OPENWRT_PATH
+        sed -i 's/192.168.1.1/192.168.1.200/g' package/base-files/files/bin/config_generate
 
     - name: Download DL Package(下载DL软件包)
       run: |
