@@ -96,11 +96,6 @@ jobs:
         cd $OPENWRT_PATH
         chmod +x diy.sh
         ./diy.sh
-
-   # - name: 加载配置文件
-     # run: |
-       # cp config/xg-040g-md.config .config
-       # make defconfig
         
     - name: Load Custom Configuration(加载自定义配置)
       run: |
