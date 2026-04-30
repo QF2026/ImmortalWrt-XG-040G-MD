@@ -17,7 +17,7 @@ env:
   # REPO_BRANCH 将由 workflow_dispatch 输入动态设置
   CONFIG_FILE: config/xg-040g-md.config
   CACHE_TOOLCHAIN: true
-  UPLOAD_BIN_DIR: true
+  UPLOAD_BIN_DIR: false
   FIRMWARE_RELEASE: false
   TZ: Asia/Shanghai
 
