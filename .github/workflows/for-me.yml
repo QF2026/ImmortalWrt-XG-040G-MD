@@ -62,7 +62,13 @@ jobs:
         VERSION_INFO=$(git show -s --date=short --format="作者: %an<br/>时间: %cd<br/>内容: %s<br/>hash: %H")
         echo "VERSION_INFO=$VERSION_INFO" >> $GITHUB_ENV
         echo "REPO_BRANCH=$REPO_BRANCH" >> $GITHUB_ENV
-
+    
+    - name: 运行 diy.sh 自定义脚本
+      run: |
+        cd $OPENWRT_PATH
+        chmod +x diy.sh
+        ./diy.sh
+        
     - name: Generate Variables(生成变量)
       run: |
         cp $CONFIG_FILE $OPENWRT_PATH/.config
@@ -90,12 +96,6 @@ jobs:
         cd $OPENWRT_PATH
         ./scripts/feeds update -a
         ./scripts/feeds install -a
-    
-    - name: 运行 diy.sh 自定义脚本
-      run: |
-        cd $OPENWRT_PATH
-        chmod +x diy.sh
-        ./diy.sh
         
     - name: Load Custom Configuration(加载自定义配置)
       run: |
@@ -163,7 +163,7 @@ jobs:
           - 这是 XG-040G-MD 的专属构建
           - 💻 目标分支：${{ env.REPO_BRANCH }}
           - ⚽ 固件源码: ${{ env.REPO_URL }}
-          - 🌐 默认地址: 192.168.1.1
+          - 🌐 默认地址: 192.168.1.200
           - 🔑 默认密码: 无
           ### 🧊 固件版本
           - 固件内核版本：${{ env.VERSION_KERNEL }}
