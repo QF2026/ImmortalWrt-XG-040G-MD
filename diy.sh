@@ -1,8 +1,7 @@
 #!/bin/bash
 #============================================================================
 # OpenWrt 定制化配置脚本 (apk包管理器环境)
-# 版本: 修订版 - 修正 luci-app-filemanager 及其依赖部分的错误配置
-# 功能: 集成 EasyTier, FileManager 及内核模块依赖
+# 功能: 集成 luci-app-easytier, FileManager 及内核模块依赖
 # 用法: ./diy.sh
 #============================================================================
 
@@ -35,16 +34,6 @@ fi
 echo ""
 echo ">>> 克隆第三方软件源码..."
 
-# 1.1 克隆 EasyTier Core & CLI (使用浅克隆和稀疏检出)
-if [ ! -d "package/easytier" ]; then
-    echo "克隆 EasyTier Core & CLI ..."
-    git clone --depth 1 --no-checkout https://github.com/EasyTier/EasyTier.git package/easytier
-    (cd package/easytier && git sparse-checkout init --cone && git sparse-checkout set easytier-core easytier-cli && git checkout)
-    echo "✅ EasyTier Core & CLI 克隆完成"
-else
-    echo "⚠️ package/easytier 目录已存在，跳过克隆"
-fi
-
 # 1.2 克隆 luci-app-easytier
 if [ ! -d "package/luci-app-easytier" ]; then
     echo "克隆 luci-app-easytier ..."
@@ -53,11 +42,6 @@ if [ ! -d "package/luci-app-easytier" ]; then
 else
     echo "⚠️ package/luci-app-easytier 目录已存在，跳过克隆"
 fi
-
-# 1.3 luci-app-filemanager 说明
-# 'luci-app-filemanager' 是官方软件源中已有的软件包，OpenWrt CI 流程会在更新 feeds 时自动引入。
-# 此应用无需额外安装中文语言包，界面将自动显示中文。
-# 对应的菜单文件为 /usr/share/luci/menu.d/luci-app-filemanager.json[reference:0]。
 
 #============================================================
 # Part 2: 添加 kmod-tun 支持（VPN 和组网工具的虚拟网卡驱动）
@@ -90,7 +74,7 @@ done
 #============================================================
 echo ""
 echo ">>> 添加基础库支持..."
-for lib in libatomic1 libncursesw6; do
+for lib in libatomic libncurses-dev; do
     sed -i "/^CONFIG_PACKAGE_${lib}=/d" "$CONFIG_FILE"
     echo "CONFIG_PACKAGE_${lib}=y" >> "$CONFIG_FILE"
 done
