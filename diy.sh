@@ -1,6 +1,8 @@
 #!/bin/bash
 #============================================================================
-# OpenWrt 配置脚本 - 修改本地的 config/xg-040g-md.config
+# OpenWrt 定制化配置脚本 (apk包管理器环境)
+# 版本: 修订版 - 修正 luci-app-filemanager 及其依赖部分的错误配置
+# 功能: 集成 EasyTier, FileManager 及内核模块依赖
 # 用法: ./diy.sh
 #============================================================================
 
@@ -10,7 +12,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
-# 配置文件路径（根据你的实际位置调整）
+# >>> 请根据你的实际配置文件路径修改 <<<
 CONFIG_FILE="config/xg-040g-md.config"
 
 # 检查配置文件是否存在
@@ -19,43 +21,111 @@ if [ ! -f "$CONFIG_FILE" ]; then
     exit 1
 fi
 
-echo ">>> 修改配置文件: $CONFIG_FILE"
+echo ">>> 开始修改配置文件: $CONFIG_FILE"
 
 # 备份原配置
-cp "$CONFIG_FILE" "$CONFIG_FILE.bak"
+if [ ! -f "$CONFIG_FILE.bak" ]; then
+    cp "$CONFIG_FILE" "$CONFIG_FILE.bak"
+    echo "✅ 已备份原配置为 $CONFIG_FILE.bak"
+fi
 
-# 1. 配置 ip-full（禁用 BusyBox ip）
-sed -i '/^CONFIG_PACKAGE_ip-full=/d' "$CONFIG_FILE"
-sed -i '/^CONFIG_BUSYBOX_CONFIG_IP/d' "$CONFIG_FILE"
-cat >> "$CONFIG_FILE" << "EOF"
-CONFIG_PACKAGE_ip-full=y
-CONFIG_BUSYBOX_CONFIG_IP=n
-CONFIG_BUSYBOX_CONFIG_IPADDR=n
-CONFIG_BUSYBOX_CONFIG_IPLINK=n
-CONFIG_BUSYBOX_CONFIG_IPROUTE=n
-CONFIG_BUSYBOX_CONFIG_IPTUNNEL=n
-CONFIG_BUSYBOX_CONFIG_IPRULE=n
-EOF
+#============================================================
+# Part 1: 克隆第三方软件包源码
+#============================================================
+echo ""
+echo ">>> 克隆第三方软件源码..."
 
-# 2. 添加软件包
+# 1.1 克隆 EasyTier Core & CLI (使用浅克隆和稀疏检出)
+if [ ! -d "package/easytier" ]; then
+    echo "克隆 EasyTier Core & CLI ..."
+    git clone --depth 1 --no-checkout https://github.com/EasyTier/EasyTier.git package/easytier
+    (cd package/easytier && git sparse-checkout init --cone && git sparse-checkout set easytier-core easytier-cli && git checkout)
+    echo "✅ EasyTier Core & CLI 克隆完成"
+else
+    echo "⚠️ package/easytier 目录已存在，跳过克隆"
+fi
+
+# 1.2 克隆 luci-app-easytier
+if [ ! -d "package/luci-app-easytier" ]; then
+    echo "克隆 luci-app-easytier ..."
+    git clone --depth 1 https://github.com/EasyTier/luci-app-easytier.git package/luci-app-easytier
+    echo "✅ luci-app-easytier 克隆完成"
+else
+    echo "⚠️ package/luci-app-easytier 目录已存在，跳过克隆"
+fi
+
+# 1.3 luci-app-filemanager 说明
+# 'luci-app-filemanager' 是官方软件源中已有的软件包，OpenWrt CI 流程会在更新 feeds 时自动引入。
+# 此应用无需额外安装中文语言包，界面将自动显示中文。
+# 对应的菜单文件为 /usr/share/luci/menu.d/luci-app-filemanager.json[reference:0]。
+
+#============================================================
+# Part 2: 添加 kmod-tun 支持（VPN 和组网工具的虚拟网卡驱动）
+#============================================================
+echo ""
+echo ">>> 添加 kmod-tun 支持..."
+sed -i '/^CONFIG_PACKAGE_kmod-tun=/d' "$CONFIG_FILE"
+echo "CONFIG_PACKAGE_kmod-tun=y" >> "$CONFIG_FILE"
+
+#============================================================
+# Part 3: 开启透明代理功能所需的内核模块
+#============================================================
+echo ""
+echo ">>> 添加透明代理 (TPROXY) 所需内核模块..."
+for mod in kmod-nft-socket kmod-nft-tproxy kmod-inet-diag kmod-netlink-diag; do
+    sed -i "/^CONFIG_PACKAGE_${mod}=/d" "$CONFIG_FILE"
+    echo "CONFIG_PACKAGE_${mod}=y" >> "$CONFIG_FILE"
+done
+
+# 同时开启必要的内核网络选项以配合 nftables 使用透明代理
+echo ">>> 开启内核 nftables 透明代理支持..."
+for opt in CONFIG_NETFILTER_XT_MATCH_SOCKET=y CONFIG_NETFILTER_XT_TARGET_TPROXY=y CONFIG_NF_TPROXY_IPV4=y CONFIG_NF_TPROXY_IPV6=y CONFIG_INET_DIAG=y CONFIG_INET_TCP_DIAG=y CONFIG_NETLINK_DIAG=y; do
+    opt_name="${opt%=*}"
+    sed -i "/^${opt_name}=/d" "$CONFIG_FILE"
+    echo "$opt" >> "$CONFIG_FILE"
+done
+
+#============================================================
+# Part 4: 添加基础库支持（可能被特定应用需要的运行时库）
+#============================================================
+echo ""
+echo ">>> 添加基础库支持..."
+for lib in libatomic1 libncursesw6; do
+    sed -i "/^CONFIG_PACKAGE_${lib}=/d" "$CONFIG_FILE"
+    echo "CONFIG_PACKAGE_${lib}=y" >> "$CONFIG_FILE"
+done
+
+#============================================================
+# Part 5: 添加常用软件列表
+#============================================================
+echo ""
+echo ">>> 添加应用软件包..."
 for pkg in \
     "luci-app-easytier" "luci-i18n-easytier-zh-cn" \
+    "luci-app-filemanager" "luci-i18n-filemanager-zh-cn" \
     "luci-app-ksmbd" "luci-i18n-ksmbd-zh-cn" \
     "luci-app-diskman" "luci-i18n-diskman-zh-cn" \
     "luci-app-hd-idle" "luci-i18n-hd-idle-zh-cn" \
     "luci-app-ttyd" "luci-i18n-ttyd-zh-cn" \
     "luci-app-aria2" "luci-i18n-aria2-zh-cn" \
     "luci-theme-argon" "luci-app-argon-config"; do
-    sed -i "/^CONFIG_PACKAGE_${pkg}=/d" "$CONFIG_FILE"
-    echo "CONFIG_PACKAGE_${pkg}=y" >> "$CONFIG_FILE"
+    var_name="CONFIG_PACKAGE_${pkg}"
+    sed -i "/^${var_name}=/d" "$CONFIG_FILE"
+    echo "${var_name}=y" >> "$CONFIG_FILE"
 done
 
-# 3. 设置默认中文和 Argon 主题
+#============================================================
+# Part 6: 设置系统默认语言和主题
+#============================================================
+echo ""
+echo ">>> 设置默认语言（简体中文）和 Argon 主题..."
 sed -i '/^CONFIG_LUCI_LANG_/d' "$CONFIG_FILE"
 sed -i '/^CONFIG_LUCI_THEME_DEFAULT=/d' "$CONFIG_FILE"
-cat >> "$CONFIG_FILE" << "EOF"
+cat >> "$CONFIG_FILE" << EOF
 CONFIG_LUCI_LANG_zh-cn=y
 CONFIG_LUCI_THEME_DEFAULT=argon
 EOF
 
-echo "✅ 配置文件已修改: $CONFIG_FILE"
+echo ""
+echo "✅ 固件配置定制完成！"
+echo "================================================"
