@@ -44,6 +44,10 @@ else
     echo "⚠️ package/luci-app-easytier 目录已存在，跳过克隆"
 fi
 
+#更新feeds,以备需要
+  ./scripts/feeds update -a
+  ./scripts/feeds install -a
+
 #更改默认IP
 sed -i 's/192.168.1.1/192.168.1.200/g' package/base-files/files/bin/config_generate
 
