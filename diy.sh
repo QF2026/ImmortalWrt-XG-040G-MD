@@ -47,6 +47,7 @@ fi
 #============================================================
 # Part 2: 添加 kmod-tun 支持（VPN 和组网工具的虚拟网卡驱动）
 #============================================================
+cd $GITHUB_WORKSPACE
 echo ""
 echo ">>> 添加 kmod-tun 支持..."
 sed -i '/^CONFIG_PACKAGE_kmod-tun=/d' "$CONFIG_FILE"
