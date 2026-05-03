@@ -92,16 +92,8 @@ for pkg in \
     "luci-app-hd-idle" "luci-i18n-hd-idle-zh-cn" \
     "luci-app-ttyd" "luci-i18n-ttyd-zh-cn" \
     "luci-app-aria2" "luci-i18n-aria2-zh-cn" \
+    "luci-app-rtp2httpd" "rtp2httpd" \
     "luci-theme-argon" "luci-app-argon-config"; do
-    var_name="CONFIG_PACKAGE_${pkg}"
-    sed -i "/^${var_name}=/d" "$CONFIG_FILE"
-    echo "${var_name}=y" >> "$CONFIG_FILE"
-done
-
-#开启在线固件更新
-echo ""
-echo ">>> 添加 Attended Sysupgrade 支持..."
-for pkg in "luci-app-attendedsysupgrade" "attendedsysupgrade-common" "auc"; do
     var_name="CONFIG_PACKAGE_${pkg}"
     sed -i "/^${var_name}=/d" "$CONFIG_FILE"
     echo "${var_name}=y" >> "$CONFIG_FILE"
