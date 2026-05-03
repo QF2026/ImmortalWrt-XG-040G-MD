@@ -18,7 +18,7 @@ env:
   CONFIG_FILE: config/xg-040g-md.config
   CACHE_TOOLCHAIN: true
   UPLOAD_BIN_DIR: false
-  FIRMWARE_RELEASE: false
+  FIRMWARE_RELEASE: true
   TZ: Asia/Shanghai
 
 jobs:
