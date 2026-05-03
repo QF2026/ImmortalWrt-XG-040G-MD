@@ -44,10 +44,13 @@ else
     echo "⚠️ package/luci-app-easytier 目录已存在，跳过克隆"
 fi
 
+#更改默认IP
+sed -i 's/192.168.1.1/192.168.1.200/g' package/base-files/files/bin/config_generate
+
 #============================================================
 # Part 2: 添加 kmod-tun 支持（VPN 和组网工具的虚拟网卡驱动）
 #============================================================
-cd $GITHUB_WORKSPACE
+cd $GITHUB_WORKSPACE/config
 echo ""
 echo ">>> 添加 kmod-tun 支持..."
 sed -i '/^CONFIG_PACKAGE_kmod-tun=/d' "$CONFIG_FILE"
