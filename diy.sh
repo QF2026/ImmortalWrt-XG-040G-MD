@@ -35,7 +35,7 @@ echo ""
 echo ">>> 克隆第三方软件源码..."
 
 # 1.2 克隆 luci-app-easytier
-cd $OPENWRT_PATH
+cd "$OPENWRT_PATH"
 if [ ! -d "package/luci-app-easytier" ]; then
     echo "克隆 luci-app-easytier ..."
     git clone --depth 1 https://github.com/EasyTier/luci-app-easytier.git package/luci-app-easytier
