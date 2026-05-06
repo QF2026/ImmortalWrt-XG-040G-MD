@@ -60,6 +60,10 @@ echo ">>> 添加 kmod-tun 支持..."
 sed -i '/^CONFIG_PACKAGE_kmod-tun=/d' "$CONFIG_FILE"
 echo "CONFIG_PACKAGE_kmod-tun=y" >> "$CONFIG_FILE"
 
+echo ">>> 添加 DEVMEM 支持...for npu"
+sed -i '/^CONFIG_BUSYBOX_DEFAULT_DEVMEM=/d' "$CONFIG_FILE"
+echo "CONFIG_BUSYBOX_DEFAULT_DEVMEM=y" >> "$CONFIG_FILE"
+
 #============================================================
 # Part 3: 开启透明代理功能所需的内核模块
 #============================================================
