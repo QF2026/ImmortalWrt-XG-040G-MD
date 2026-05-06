@@ -42,8 +42,7 @@ rm -rf package/luci-app-easytier
 
 #更新feeds,以备需要
   ./scripts/feeds update -a
-  ./scripts/feeds install -a
-
+  ./scripts/feeds install luci-app-airoha-npu luci-app-easytier
 #更改默认IP
 sed -i 's/192.168.1.1/192.168.1.200/g' package/base-files/files/bin/config_generate
 
