@@ -37,8 +37,11 @@ echo ">>> 克隆第三方软件源码..."
 cd "$OPENWRT_PATH"
 rm -rf package/luci-app-easytier
     git clone --depth 1 https://github.com/EasyTier/luci-app-easytier.git package/luci-app-easytier
-    echo "luci-app-easytier 强制克隆完成"
+    echo "luci-app-easytier 克隆完成"
 
+rm -rf package/luci-app-airoha-npu
+git clone --depth 1 https://github.com/rchen14b/luci-app-airoha-npu.git package/luci-app-airoha-npu
+    echo "luci-app-airoha-npu 更新完成"
 
 #更新feeds,以备需要
   ./scripts/feeds update -a
@@ -68,17 +71,17 @@ for mod in kmod-nft-socket kmod-nft-tproxy kmod-inet-diag kmod-netlink-diag; do
 done
 
 # 同时开启必要的内核网络选项以配合 nftables 使用透明代理
-echo ">>> 开启内核 nftables 透明代理支持..."
-for opt in CONFIG_NETFILTER_XT_MATCH_SOCKET CONFIG_NETFILTER_XT_TARGET_TPROXY CONFIG_NF_TPROXY_IPV4 CONFIG_NF_TPROXY_IPV6 CONFIG_INET_DIAG CONFIG_INET_TCP_DIAG CONFIG_NETLINK_DIAG; do
-    sed -i "/${opt}/d" "$CONFIG_FILE"
-    echo "${opt}=y" >> "$CONFIG_FILE"
-done
+#echo ">>> 开启内核 nftables 透明代理支持..."
+#for opt in CONFIG_NETFILTER_XT_MATCH_SOCKET CONFIG_NETFILTER_XT_TARGET_TPROXY CONFIG_NF_TPROXY_IPV4 CONFIG_NF_TPROXY_IPV6 CONFIG_INET_DIAG CONFIG_INET_TCP_DIAG CONFIG_NETLINK_DIAG; do
+ #   sed -i "/${opt}/d" "$CONFIG_FILE"
+  #  echo "${opt}=y" >> "$CONFIG_FILE"
+#done
 
 #============================================================
 # Part 4: 添加基础库支持（可能被特定应用需要的运行时库）
 #============================================================
-echo ">>> 添加基础库及airoha-npu支持..."
-for lib in libatomic libncurses-dev luci-app-airoha-npu; do
+echo ">>> 添加基础库支持..."
+for lib in libatomic libncurses-dev; do
     sed -i "/CONFIG_PACKAGE_${lib}/d" "$CONFIG_FILE"
     echo "CONFIG_PACKAGE_${lib}=y" >> "$CONFIG_FILE"
 done
