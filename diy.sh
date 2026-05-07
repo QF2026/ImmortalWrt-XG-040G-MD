@@ -39,13 +39,13 @@ rm -rf package/luci-app-easytier
     git clone --depth 1 https://github.com/EasyTier/luci-app-easytier.git package/luci-app-easytier
     echo "luci-app-easytier 克隆完成"
 
-rm -rf package/luci-app-airoha-npu
-git clone --depth 1 https://github.com/rchen14b/luci-app-airoha-npu.git package/luci-app-airoha-npu
-    echo "luci-app-airoha-npu 更新完成"
+#rm -rf package/luci-app-airoha-npu
+#git clone --depth 1 #https://github.com/rchen14b/luci-app-airoha-npu.git package/luci-app-airoha-npu
+  #  echo "luci-app-airoha-npu 更新完成"
 
 #更新feeds,以备需要
   ./scripts/feeds update -a
-  ./scripts/feeds install luci-app-airoha-npu luci-app-easytier
+  ./scripts/feeds install luci-app-easytier
 #更改默认IP
 sed -i 's/192.168.1.1/192.168.1.200/g' package/base-files/files/bin/config_generate
 
@@ -57,9 +57,9 @@ echo ">>> 添加 kmod-tun 支持..."
 sed -i '/CONFIG_PACKAGE_kmod-tun/d' "$CONFIG_FILE"
 echo "CONFIG_PACKAGE_kmod-tun=y" >> "$CONFIG_FILE"
 
-echo ">>> 添加 DEVMEM 支持...for npu"
-sed -i '/CONFIG_BUSYBOX_DEFAULT_DEVMEM/d' "$CONFIG_FILE"
-echo "CONFIG_BUSYBOX_DEFAULT_DEVMEM=y" >> "$CONFIG_FILE"
+#echo ">>> 添加 DEVMEM 支持...for npu"
+#sed -i '/CONFIG_BUSYBOX_DEFAULT_DEVMEM/d' "$CONFIG_FILE"
+#echo "CONFIG_BUSYBOX_DEFAULT_DEVMEM=y" >> "$CONFIG_FILE"
 
 #============================================================
 # Part 3: 开启透明代理功能所需的内核模块
