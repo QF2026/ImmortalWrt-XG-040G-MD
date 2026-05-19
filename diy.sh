@@ -29,7 +29,7 @@ if [ ! -f "$CONFIG_FILE.bak" ]; then
 fi
 
 #============================================================
-# Part 1: 克隆第三方软件包源码
+# Part 1: 克隆easytier源码，更改IP
 #============================================================
 echo ">>> 克隆第三方软件源码..."
 
@@ -39,27 +39,20 @@ rm -rf package/luci-app-easytier
     git clone --depth 1 https://github.com/EasyTier/luci-app-easytier.git package/luci-app-easytier
     echo "luci-app-easytier 克隆完成"
 
-#rm -rf package/luci-app-airoha-npu
-#git clone --depth 1 #https://github.com/rchen14b/luci-app-airoha-npu.git package/luci-app-airoha-npu
-  #  echo "luci-app-airoha-npu 更新完成"
-
 #更新feeds,以备需要
   ./scripts/feeds update -a
-  ./scripts/feeds install luci-app-easytier
+  ./scripts/feeds install -a -f
+
 #更改默认IP
 sed -i 's/192.168.1.1/192.168.1.200/g' package/base-files/files/bin/config_generate
 
 #============================================================
-# Part 2: 添加 kmod-tun 支持（VPN 和组网工具的虚拟网卡驱动）
+# Part 2: 添加 kmod-tun 支持
 #============================================================
 cd "$SCRIPT_DIR"
 echo ">>> 添加 kmod-tun 支持..."
 sed -i '/CONFIG_PACKAGE_kmod-tun/d' "$CONFIG_FILE"
 echo "CONFIG_PACKAGE_kmod-tun=y" >> "$CONFIG_FILE"
-
-#echo ">>> 添加 DEVMEM 支持...for npu"
-#sed -i '/CONFIG_BUSYBOX_DEFAULT_DEVMEM/d' "$CONFIG_FILE"
-#echo "CONFIG_BUSYBOX_DEFAULT_DEVMEM=y" >> "$CONFIG_FILE"
 
 #============================================================
 # Part 3: 开启透明代理功能所需的内核模块
@@ -70,18 +63,11 @@ for mod in kmod-nft-socket kmod-nft-tproxy kmod-inet-diag kmod-netlink-diag; do
     echo "CONFIG_PACKAGE_${mod}=y" >> "$CONFIG_FILE"
 done
 
-# 同时开启必要的内核网络选项以配合 nftables 使用透明代理
-#echo ">>> 开启内核 nftables 透明代理支持..."
-#for opt in CONFIG_NETFILTER_XT_MATCH_SOCKET CONFIG_NETFILTER_XT_TARGET_TPROXY CONFIG_NF_TPROXY_IPV4 CONFIG_NF_TPROXY_IPV6 CONFIG_INET_DIAG CONFIG_INET_TCP_DIAG CONFIG_NETLINK_DIAG; do
- #   sed -i "/${opt}/d" "$CONFIG_FILE"
-  #  echo "${opt}=y" >> "$CONFIG_FILE"
-#done
-
 #============================================================
-# Part 4: 添加基础库支持（可能被特定应用需要的运行时库）
+# Part 4: 添加有关支持（test）
 #============================================================
-echo ">>> 添加基础库支持..."
-for lib in libatomic libncurses-dev; do
+echo ">>> 添加基础库及有关支持..."
+for lib in libatomic libncurses-dev openssl-util rpcd-mod-rpcsys; do
     sed -i "/CONFIG_PACKAGE_${lib}/d" "$CONFIG_FILE"
     echo "CONFIG_PACKAGE_${lib}=y" >> "$CONFIG_FILE"
 done
