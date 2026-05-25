@@ -48,7 +48,7 @@ sed -i 's/192.168.1.1/192.168.1.200/g' package/base-files/files/bin/config_gener
 
 #添加升级固件支持(测试)
 mkdir -p openwrt/target/linux/airoha/an7581/base-files/etc/lib/upgrade/
-    cp -af patch-25.12/target/linux/airoha/an7581/base-files/etc/lib/upgrade/platform.sh openwrt/target/linux/airoha/an7581/base-files/etc/lib/upgrade/platform.sh
+    cp -af "$SCRIPT_DIR/patch-25.12/target/linux/airoha/an7581/base-files/etc/lib/upgrade/platform.sh" openwrt/target/linux/airoha/an7581/base-files/etc/lib/upgrade/platform.sh
 #============================================================
 # Part 2: 添加 kmod-tun 支持
 #============================================================
