@@ -46,6 +46,9 @@ rm -rf package/luci-app-easytier
 #更改默认IP
 sed -i 's/192.168.1.1/192.168.1.200/g' package/base-files/files/bin/config_generate
 
+#添加升级固件支持(测试)
+mkdir -p openwrt/target/linux/airoha/an7581/base-files/etc/lib/upgrade/
+    cp -af patch-25.12/target/linux/airoha/an7581/base-files/etc/lib/upgrade/platform.sh openwrt/target/linux/airoha/an7581/base-files/etc/lib/upgrade/platform.sh
 #============================================================
 # Part 2: 添加 kmod-tun 支持
 #============================================================
@@ -85,6 +88,7 @@ for pkg in \
     "luci-app-ttyd" "luci-i18n-ttyd-zh-cn" \
     "luci-app-aria2" "luci-i18n-aria2-zh-cn" \
     "luci-app-rtp2httpd" "rtp2httpd" \
+    "unzip" \
     "luci-theme-argon" "luci-app-argon-config"; do
     var_name="CONFIG_PACKAGE_${pkg}"
     sed -i "/${var_name}/d" "$CONFIG_FILE"
