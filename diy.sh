@@ -34,8 +34,9 @@ rm -rf package/luci-app-easytier
 sed -i 's/192.168.1.1/192.168.1.200/g' package/base-files/files/bin/config_generate
 
 # 添加升级固件支持(test)
-mkdir -p openwrt/target/linux/airoha/an7581/base-files/lib/upgrade/
-cp -af "$SCRIPT_DIR/patch-25.12/target/linux/airoha/an7581/base-files/lib/upgrade/platform.sh" openwrt/target/linux/airoha/an7581/base-files/lib/upgrade/platform.sh
+mkdir -p openwrt/target/linux/airoha/base-files/lib/upgrade/
+cp -af "$SCRIPT_DIR/patch-25.12/target/linux/airoha/an7581/base-files/lib/upgrade/platform.sh" openwrt/target/linux/airoha/base-files/lib/upgrade/platform.sh
+chmod +x openwrt/target/linux/airoha/base-files/lib/upgrade/platform.sh
 
 cd "$SCRIPT_DIR"
 sed -i '/CONFIG_PACKAGE_kmod-tun/d' "$CONFIG_FILE"
