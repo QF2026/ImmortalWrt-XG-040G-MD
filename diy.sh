@@ -64,7 +64,7 @@ for pkg in \
     "luci-app-ttyd" "luci-i18n-ttyd-zh-cn" \
     "luci-app-aria2" "luci-i18n-aria2-zh-cn" \
     "luci-app-rtp2httpd" "rtp2httpd" \
-    "unzip" \
+    "unzip" "openssl-util" \
     "luci-theme-argon" "luci-app-argon-config"; do
     var_name="CONFIG_PACKAGE_${pkg}"
     sed -i "/${var_name}/d" "$CONFIG_FILE"
